@@ -69,12 +69,36 @@ const create = async (req, res, next)  => {
     });
 };
 
-
 const index =  (req, res, next) =>
     Relation.find()
-        .then((relation) => relation.map((relation) => relation.view(true)))
-        .then(success(res))
-        .catch(next);
+        .then(relations => {
+            const requests = [];
+
+            relations.map((relation) => {
+                requests.push(
+                    User.findById(relation.user, 'name')
+                        .then(user => {
+                            relation.set('userName', user.name, {strict: false});
+                            return relation;
+                        }).catch(next))
+            });
+
+            Promise.all(requests)
+                .then((relations) => relations.map((relation) => {
+
+                    return {
+                        user_id: relation.user,
+                        numberOfViews: relation.meta.numberOfViews,
+                        id: relation._id,
+                        createdAt: relation.createdAt,
+                        updatedAt: relation.updatedAt,
+                        expireTime: relation.meta.time,
+                        userName: relation.get('userName'),
+                    };
+                }))
+                .then(success(res))
+                .catch(next);
+        });
 
 const indexRelation = ({ params }, res, next) => {
 
@@ -124,6 +148,20 @@ const update = async ({ body, user, params }, res, next)  => {
         return res.status(403).end();
     }
 };
+
+const updateViews = async ({ body, params }, res, next)  => {
+
+    let toUpdate = { meta : { numberOfViews: body.numberOfViews }, updatedAt: Date.now() }
+
+    Relation.findById(params.id)
+        .then(notFound(res))
+        .then((relation) => relation ? relation.set(toUpdate).save() : null)
+        .then((relation) => relation ? relation.view(true) : null)
+        .then(success(res))
+        .catch(next);
+
+};
+
 
 const remove = async (req, res, next)  => {
 
@@ -224,4 +262,4 @@ const filterByTextEqual =  ({params}, res, next) =>
 
 
 module.exports = { create, index, indexRelation, remove, update, sortByCreatedAtAscending, sortByUsersAscending, sortByTimeDescending,
-    filterByUser, filterByTimeBetween, filterByTextEqual }
+    filterByUser, filterByTimeBetween, filterByTextEqual, updateViews }

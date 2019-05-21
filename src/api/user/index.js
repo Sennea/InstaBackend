@@ -1,19 +1,20 @@
 const { Router }= require('express');
 const { token, password } = require('../../services/passport');
-const { index, showMe, show, create, update, destroy, auth, forgot, reset } = require("./controller");
+const { index, showMe, show, create, update, destroy, auth, forgot, reset, filterByName } = require("./controller");
 
 const router = new Router();
 
 router.get('/',
-    token({required: true, roles: ['admin']}),
     index);
+
+router.get('/filter',
+    filterByName);
 
 router.get('/me',
     token({required: true}),
     showMe);
 
 router.get('/:id',
-    token({required: true, roles: ['admin']}),
     show);
 
 router.post('/',

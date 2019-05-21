@@ -1,19 +1,10 @@
 const http = require('http');
-
 const Agenda = require('agenda');
-
 const { env, port, ip, apiRoot, mongo } = require('./config')
-
 const express = require('./services/express')
-
 const api = require('./api')
-
 const mongoose = require('./services/mongoose')
-
 const app = express(apiRoot, api)
-
-
-
 const server = http.createServer(app)
 
 // Connect to mongoose and set up agenda that will delete old relations ----------

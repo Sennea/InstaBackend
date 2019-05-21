@@ -7,8 +7,9 @@ const relationSchema = new Schema({
         ref: 'User'
     },
     meta:{
-        text: {
-            type: String,
+        numberOfViews: {
+            type: Number,
+            default: 0
         },
         time: {
             type: Date,
@@ -30,8 +31,8 @@ relationSchema.methods = {
 
         const view = {
             user_id: this.user,
-            text: this.meta.text
-        }
+            numberOfViews: this.meta.numberOfViews
+        };
 
         return full ? {
             ...view,

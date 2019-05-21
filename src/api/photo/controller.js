@@ -28,7 +28,6 @@ const create = async (req, res, next)  => {
 
         const PhotoGridFs = require('./gridfs');
 
-        console.log(req.file.id);
 
         PhotoGridFs.readById(req.file.id, async (err, buff) => {
 
@@ -41,7 +40,6 @@ const create = async (req, res, next)  => {
                     return res.status(400).json({errors: [`That kind of file is not allowed!`]})
                 })
             }
-            console.log(req.file);
             req.body._id = req.file.id;
 
             let photo = null;
@@ -73,9 +71,35 @@ const create = async (req, res, next)  => {
 
 const index =  (req, res, next) =>
     Photo.find()
-        .then((photo) => photo.map((photo) => photo.view(true)))
-        .then(success(res))
-        .catch(next);
+        .then(photos => {
+            const requests = [];
+
+            photos.map((photo) => {
+                requests.unshift(
+                    User.findById(photo.user, 'name')
+                        .then(user => {
+                            photo.set('userName', user.name, {strict: false});
+                            return photo;
+                        }).catch(next))
+            });
+
+            Promise.all(requests)
+                .then((photos) => photos.map((photo) => {
+
+                return {
+                    user: photo.user,
+                    likes: photo.meta.likes,
+                    description: photo.meta.description,
+                    id: photo._id,
+                    createdAt: photo.createdAt,
+                    updatedAt: photo.updatedAt,
+                    userName: photo.get('userName')
+                };
+            }))
+                .then(success(res))
+                .catch(next);
+        });
+
 
 const indexPhoto = ({ params }, res, next) => {
 

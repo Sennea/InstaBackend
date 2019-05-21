@@ -70,14 +70,12 @@ userSchema.pre('save', function (next) {
 
 });
 
-
 userSchema.methods = {
     view (full){
         let view = {};
         let fields = ['id', 'name', ];
-
         if(full){
-            fields = [...fields, 'role', 'email', 'albums', 'photos', 'relations', "resetPasswordExpires", "resetPasswordToken", "password"];
+            fields = [...fields, 'role', 'email', 'albums', 'photos', 'relations', "resetPasswordExpires", "resetPasswordToken"];
         }
 
         fields.forEach((field) => { view[field] = this[field]});

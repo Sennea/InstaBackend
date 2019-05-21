@@ -15,6 +15,15 @@ const index =  (req, res, next) =>
        .then(success(res))
        .catch(next);
 
+const filterByName =  (req, res, next) =>{
+    console.log(req.query.search)
+    User.find({name: new RegExp("^" + req.query.search)})
+        .then((users) => users.map((user) => user.view(true)))
+        .then(success(res))
+        .catch(next);
+};
+
+
 const show = ({ params }, res, next) =>
     User.findById(params.id)
         .then(notFound(res))
@@ -170,5 +179,5 @@ const destroy = ({ params }, res, next) =>
         .catch(next);
 
 module.exports = {
-  create, index, show, update, destroy, showMe, auth, forgot, reset
+  create, index, show, update, destroy, showMe, auth, forgot, reset, filterByName
 };
