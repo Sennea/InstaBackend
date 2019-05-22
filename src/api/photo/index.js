@@ -1,7 +1,7 @@
 const { Router } = require('express')
 
 const { create, index, indexPhoto, update, remove, sortByCreatedAtAscending, sortByUsersAscending, sortByLikesAscending,
-    filterByUser, filterByLikesMoreThan, filterByDescriptionContains } = require('./controller')
+    filterByUser, filterByLikesMoreThan, filterByDescriptionContains, updateLikes } = require('./controller')
 
 const { token } = require('../../services/passport');
 
@@ -21,6 +21,9 @@ router.get('/:id',
 router.put('/:id',
     token({ required: true }),
     update);
+
+router.put('/:id/updateLikes',
+    updateLikes);
 
 router.delete('/:id',
     token({ required: true }),

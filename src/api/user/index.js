@@ -1,6 +1,6 @@
 const { Router }= require('express');
 const { token, password } = require('../../services/passport');
-const { index, showMe, show, create, update, destroy, auth, forgot, reset, filterByName } = require("./controller");
+const { index, showMe, show, create, update, destroy, auth, forgot, reset, filterByName, updateMeta } = require("./controller");
 
 const router = new Router();
 
@@ -27,6 +27,10 @@ router.post('/auth',
 router.put('/',
     token({required: true}),
     update);
+
+router.put('/updateMeta',
+    token({required: true}),
+    updateMeta);
 
 router.delete('/:id',
     token({ required: true}),

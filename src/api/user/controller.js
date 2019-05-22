@@ -161,13 +161,16 @@ const reset = function(req, res, next) {
         });
 };
 
-const update = ({ body, user }, res, next) =>
+const update = ({ body, user }, res, next) =>{
+    console.log("HEHE")
     User.findById(user.id)
         .then(notFound(res))
         .then((user) => user ? Object.assign(user, body).save() : null)
         .then((user) => user ? user.view(true) : null)
         .then(success(res))
         .catch((err) => catchDuplicateEmail(res, err, next));
+}
+
 
 
 
@@ -178,6 +181,46 @@ const destroy = ({ params }, res, next) =>
         .then(success(res, 204))
         .catch(next);
 
+const updateMeta = async (req, res, next) => {
+
+    const user = req.user;
+    const {body} = req;
+
+    let likes = 0;
+    let dislikes = 0;
+
+
+    if (body.disliked) {
+
+        if (user.meta.disliked.indexOf(body.disliked) <= -1) {
+            user.meta.disliked.push(body.disliked);
+            dislikes = 1;
+            if (user.meta.liked.indexOf(body.disliked) > -1) {
+                user.meta.liked.splice(user.meta.liked.indexOf(body.disliked), 1);
+                likes = -1;
+            }
+        }
+    }
+
+    if (body.liked) {
+        if (user.meta.liked.indexOf(body.liked) <= -1) {
+            user.meta.liked.push(body.liked);
+            likes = 1;
+            if (user.meta.disliked.indexOf(body.liked) > -1) {
+                user.meta.disliked.splice(user.meta.disliked.indexOf(body.liked), 1);
+                dislikes = -1;
+            }
+        }
+    }
+
+
+    {
+        await user.save();
+        success(res)({likes: likes, dislikes: dislikes})
+    }
+
+};
+
 module.exports = {
-  create, index, show, update, destroy, showMe, auth, forgot, reset, filterByName
+  create, index, show, update, destroy, showMe, auth, forgot, reset, filterByName, updateMeta
 };

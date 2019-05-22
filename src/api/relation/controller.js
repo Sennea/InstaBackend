@@ -217,11 +217,14 @@ const remove = async (req, res, next)  => {
 
 
 
-const sortByCreatedAtAscending =  (req, res, next) =>
-    Relation.find({}, null, {sort: {createdAt: 1}})
+const sortByCreatedAtAscending =  (req, res, next) =>{
+    console.log(req.query.dir);
+    Relation.find({}, null, {sort: {createdAt: req.query.dir}})
         .then((relation) => relation.map((relation) => relation.view(true)))
         .then(success(res))
         .catch(next);
+}
+
 
 
 const sortByUsersAscending =  ({params}, res, next) =>

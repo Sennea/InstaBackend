@@ -165,6 +165,23 @@ const update = async ({ body, user, params }, res, next)  => {
     }
 };
 
+
+const updateLikes = async ({ body, params }, res, next)  => {
+
+        let photo = await Photo.findById(params.id)
+            .then(notFound(res));
+
+        photo.meta.likes += body.likes;
+
+        {
+            await photo.save();
+            success(res, 201)(photo);
+        }
+
+
+};
+
+
 const remove = async (req, res, next)  => {
 
     const { id } = req.params;
@@ -265,4 +282,4 @@ const filterByDescriptionContains =  ({params}, res, next) =>
 
 
 module.exports = { create, index, indexPhoto, remove, update, sortByCreatedAtAscending, sortByUsersAscending, sortByLikesAscending,
-    filterByUser, filterByLikesMoreThan, filterByDescriptionContains}
+    filterByUser, filterByLikesMoreThan, filterByDescriptionContains, updateLikes}

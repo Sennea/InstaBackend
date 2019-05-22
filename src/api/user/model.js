@@ -49,6 +49,21 @@ const userSchema = new Schema({
         type: Schema.ObjectId,
         ref: "Relation",
     }],
+    meta: {
+        liked: [{
+            type: Schema.ObjectId,
+            ref: "Photo"
+        }]
+        ,
+        disliked: [
+            {
+                type: Schema.ObjectId,
+                ref: "Photo"
+            }
+        ]
+    }
+    ,
+
 
     resetPasswordToken: String,
     resetPasswordExpires: Date
@@ -73,7 +88,7 @@ userSchema.pre('save', function (next) {
 userSchema.methods = {
     view (full){
         let view = {};
-        let fields = ['id', 'name', ];
+        let fields = ['id', 'name', 'meta' ];
         if(full){
             fields = [...fields, 'role', 'email', 'albums', 'photos', 'relations', "resetPasswordExpires", "resetPasswordToken"];
         }
